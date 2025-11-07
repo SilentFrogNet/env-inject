@@ -1,0 +1,16 @@
+{
+  "name": "env-inject",
+  "version": "1.0.0",
+  "description": "Tool to inject environment variables into your project build",
+  "license": "MIT",
+  "author": "Ilario Dal Grande",
+  "main": "./index.js",
+  "bin": "./cli.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
