@@ -1,5 +1,12 @@
 # env-inject
 
+[![npm version](https://img.shields.io/npm/v/@silentfrog/env-inject)](https://www.npmjs.com/package/@silentfrog/env-inject)
+[![npm downloads](https://img.shields.io/npm/dm/@silentfrog/env-inject)](https://www.npmjs.com/package/@silentfrog/env-inject)
+[![CI](https://github.com/SilentFrogNet/env-inject/actions/workflows/ci.yml/badge.svg)](https://github.com/SilentFrogNet/env-inject/actions/workflows/ci.yml)
+[![node](https://img.shields.io/node/v/@silentfrog/env-inject)](package.json)
+[![types](https://img.shields.io/npm/types/@silentfrog/env-inject)](index.d.ts)
+[![license](https://img.shields.io/npm/l/@silentfrog/env-inject)](LICENSE)
+
 A tool to inject environment variables into your project build.
 
 Frontend builders like Vite and Create React App bake environment variables into the bundle at **build time**, so you need a separate build for every environment. `env-inject` lets you configure the app at **runtime** instead. It writes the variables you choose to an `env.js` file that your app loads before the bundle and reads from `window.env`.
