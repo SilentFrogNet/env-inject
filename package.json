@@ -1,17 +1,38 @@
 {
   "name": "@silentfrog/env-inject",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "description": "Tool to inject environment variables into your project build",
+  "keywords": ["env", "environment", "runtime", "vite", "react", "create-react-app", "docker", "nginx"],
+  "homepage": "https://github.com/SilentFrogNet/env-inject#readme",
+  "bugs": {
+    "url": "https://github.com/SilentFrogNet/env-inject/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SilentFrogNet/env-inject.git"
+  },
   "license": "MIT",
   "author": "Ilario Dal Grande",
-  "main": "./index.js",
-  "bin": "./cli.js",
   "type": "module",
-  "files": [
-    "cli.js",
-    "index.js",
-    "utils"
-  ],
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./client": {
+      "types": "./client.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "env-inject": "./cli.js"
+  },
+  "files": ["cli.js", "index.js", "index.d.ts", "client.d.ts", "utils"],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "node --test test/*.test.js"
   },

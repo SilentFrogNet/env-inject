@@ -8,12 +8,12 @@ You can build once and then deploy the same artifact (for example a Docker image
 
 ## How it works
 
-1. Reads environment variables from the current process and from a `.env` file in the working directory, if there is one. Variables already set in the environment take precedence over `.env`.
-2. Keeps only variables with a public prefix:
+1. Reads environment variables from the current process and from a `.env` file in the working directory, if there is one. Use `--dotenv` to load other files. Variables already set in the environment take precedence over the files.
+2. Keeps only variables with a public prefix, plus any you add with `--prefix`:
    - `PUBLIC_`
    - `VITE_`
    - `REACT_APP_`
-3. Writes them to `<out>/env.js` (default: `./public/env.js`):
+3. Writes them to `<out>/env.js` (default: `./public/env.js`), sorted by name. The console output lists only variable names, never values.
 
    ```js
    window.env = {
@@ -54,10 +54,17 @@ env-inject [options] [builder]
 | `-o, --out <dir>`     | Destination folder for `env.js` (default: `./public`)           |
 | `-y, --yes`           | Overwrite an existing `env.js` without asking                   |
 | `-np, --no-public`    | Do not inject `PUBLIC_` variables                               |
+| `--prefix <PREFIX>`   | Also inject variables with this prefix (repeatable)             |
+| `--dotenv <path>`     | Load variables from this file instead of `.env` (repeatable)    |
+| `--global <name>`     | Name of the `window` property (default: `env`)                  |
+| `--filename <name>`   | Name of the generated file (default: `env.js`)                  |
+| `--dry-run`           | Print the generated file instead of writing it                  |
 | `-v, --version`       | Show the version number                                         |
 | `-h, --help`          | Show help information                                           |
 
-`--out` accepts both `-o dir` and `--out=dir`.
+Options that take a value accept both `--out dir` and `--out=dir`.
+
+With several `--dotenv` files, a variable takes the value from the first file that defines it. List the most specific file first, for example `--dotenv .env.production --dotenv .env`.
 
 | Builder         | Prefixes injected                        |
 | --------------- | ---------------------------------------- |
@@ -83,6 +90,15 @@ env-inject --no-public -o build react-scripts
 
 # Pass variables inline
 VITE_API_URL=https://api.example.com env-inject -y vite
+
+# Load production settings, falling back to .env
+env-inject -y --dotenv .env.production --dotenv .env vite
+
+# Also inject APP_* variables, as window.__ENV__ in config.js
+env-inject -y --prefix APP_ --global __ENV__ --filename config.js
+
+# Check what would be generated without writing anything
+env-inject --dry-run vite
 ```
 
 ### Load `env.js` in your app
@@ -115,13 +131,13 @@ const apiUrl = window.env?.VITE_API_URL ?? import.meta.env.VITE_API_URL;
 const apiUrl = window.env?.REACT_APP_API_URL ?? process.env.REACT_APP_API_URL;
 ```
 
-For TypeScript, declare the global (for example in `src/env.d.ts`):
+For TypeScript, the package ships a declaration for `window.env`. Reference it once, for example in `src/vite-env.d.ts`:
 
 ```ts
-interface Window {
-  env?: Record<string, string | undefined>;
-}
+/// <reference types="@silentfrog/env-inject/client" />
 ```
+
+If you use `--global`, declare your own property name instead.
 
 ### Generate `env.js` during local development
 
@@ -212,6 +228,30 @@ services:
 
 > [!TIP]
 > Configure nginx to send `env.js` with `Cache-Control: no-store` so browsers don't keep serving an old configuration after a redeploy.
+
+## Programmatic API
+
+You can also call the package from a Node script (ESM only):
+
+```js
+import { injectEnv } from '@silentfrog/env-inject';
+
+const { vars, filePath, written } = await injectEnv({
+  out: './dist',
+  builder: 'vite',
+  yes: true,
+});
+console.log(`Wrote ${Object.keys(vars).length} variables to ${filePath}`);
+```
+
+`injectEnv` accepts the same settings as the CLI: `out`, `builder`, `noPublic`, `prefixes`, `envFiles`, `globalName`, `filename`, `yes` and `dryRun`. Two more options are only available here:
+
+- `env`: the variables to filter, instead of `process.env`.
+- `envFiles: false`: skip loading any env file.
+
+It resolves to `{ vars, prefixes, filePath, content, written }`, and it throws on invalid options or a missing env file.
+
+The lower-level helpers `getPrefixes`, `filterEnv` and `buildEnvJsContent` are exported too, and type declarations are included.
 
 ## License
 
