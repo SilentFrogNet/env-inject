@@ -10,28 +10,33 @@ const packageJson = require("./package.json");
 
 // Capture user input from the CLI
 const [,, ...arg] = process.argv;
-const args = processArgs(arg, ["--no-public", "all", "vite", "react-scripts"]);
+let args;
+try {
+  args = processArgs(arg);
+} catch (err) {
+  console.error(err.message);
+  console.error("Run env-inject --help for usage.");
+  process.exit(1);
+}
 
 if (args.version) {
   console.log(`Version: ${packageJson.version}`);
-} else if (args.help) {
+  process.exit(0);
+}
+if (args.help) {
   console.log("Usage: env-inject [options] [builder]");
   console.log("Options:");
   console.log("  -v,  --version                     Show version number");
   console.log("  -h,  --help                        Show help information");
   console.log("  -np, --no-public                   Will not inject PUBLIC_ variables");
-  console.log("  -o,  --out                         Destination folder (default: ./public)");
+  console.log("  -o,  --out <dir>                   Destination folder (default: ./public)");
   console.log("  -y,  --yes                         Automatically overwrite existing env.js file");
   console.log(" ");
   console.log("  builder: all|vite|react-scripts    Specify the builder to target (default: all)");
+  process.exit(0);
 }
 
 console.log("Injecting environment variables...");
-
-const envVars = {
-  ...process.env,
-  ...import.meta.env,
-};
 
 let varsToInclude = ["PUBLIC_", "VITE_", "REACT_APP_"];
 if (args.no_public) {
@@ -43,17 +48,15 @@ if (args.builder === "vite") {
   varsToInclude = varsToInclude.filter(prefix => prefix !== "VITE_");
 }
 
-const filteredEnvVars = Object.keys(envVars)
+const filteredEnvVars = Object.keys(process.env)
   .filter(key => varsToInclude.some(prefix => key.startsWith(prefix)))
   .reduce((obj, key) => {
-    obj[key] = envVars[key];
+    obj[key] = process.env[key];
     return obj;
-  }, {})
+  }, {});
 
 console.log(filteredEnvVars);
 
-// Write env file using the util
-(async () => {
-  await writeEnvFile(args.out, filteredEnvVars, args.yes);
-})();
-
+if (!(await writeEnvFile(args.out, filteredEnvVars, args.yes))) {
+  process.exit(1);
+}

@@ -14,7 +14,7 @@ export const writeEnvFile = async (outDir, vars, yes=false) => {
     fs.mkdirSync(publicDir, { recursive: true });
   } catch (err) {
     console.error('Failed to create public directory:', err);
-    return;
+    return false;
   }
 
   const write = () => {
@@ -22,15 +22,17 @@ export const writeEnvFile = async (outDir, vars, yes=false) => {
     try {
       fs.writeFileSync(filePath, contents, 'utf8');
       console.log(`Wrote environment file to ${filePath}`);
+      return true;
     } catch (err) {
       console.error('Failed to write env file:', err);
+      return false;
     }
   };
 
   if (!yes &&fs.existsSync(filePath)) {
     if (!process.stdin.isTTY) {
-      console.log(`${filePath} exists and stdin is not a TTY; skipping overwrite.`);
-      return;
+      console.error(`${filePath} exists and stdin is not a TTY; use --yes to overwrite.`);
+      return false;
     }
 
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -42,11 +44,10 @@ export const writeEnvFile = async (outDir, vars, yes=false) => {
     });
 
     if (answer === 'y' || answer === 'yes') {
-      write();
-    } else {
-      console.log('Aborted. env.js not overwritten.');
+      return write();
     }
-  } else {
-    write();
+    console.log('Aborted. env.js not overwritten.');
+    return false;
   }
+  return write();
 };

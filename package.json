@@ -1,6 +1,6 @@
 {
   "name": "@silentfrog/env-inject",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tool to inject environment variables into your project build",
   "license": "MIT",
   "author": "Ilario Dal Grande",
@@ -8,7 +8,7 @@
   "bin": "./cli.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "dotenv": "^17.2.3"
