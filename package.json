@@ -1,8 +1,17 @@
 {
   "name": "@silentfrog/env-inject",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Tool to inject environment variables into your project build",
-  "keywords": ["env", "environment", "runtime", "vite", "react", "create-react-app", "docker", "nginx"],
+  "keywords": [
+    "env",
+    "environment",
+    "runtime",
+    "vite",
+    "react",
+    "create-react-app",
+    "docker",
+    "nginx"
+  ],
   "homepage": "https://github.com/SilentFrogNet/env-inject#readme",
   "bugs": {
     "url": "https://github.com/SilentFrogNet/env-inject/issues"
@@ -29,7 +38,13 @@
   "bin": {
     "env-inject": "./cli.js"
   },
-  "files": ["cli.js", "index.js", "index.d.ts", "client.d.ts", "utils"],
+  "files": [
+    "cli.js",
+    "index.js",
+    "index.d.ts",
+    "client.d.ts",
+    "utils"
+  ],
   "engines": {
     "node": ">=18"
   },
